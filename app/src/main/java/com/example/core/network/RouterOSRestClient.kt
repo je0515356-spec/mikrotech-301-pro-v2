@@ -116,6 +116,16 @@ class RouterOSRestClient(
         }
     }
 
+    override suspend fun getRouterSerial(): Result<String> {
+        val req = authenticatedRequestBuilder("/system/routerboard").get().build()
+        return executeRequest(req).mapCatching { raw ->
+            val json = org.json.JSONArray(raw)
+            val serial = json.optJSONObject(0)?.optString("serial-number").orEmpty().trim()
+            require(serial.isNotEmpty()) { "Numéro de série MikroTik indisponible" }
+            serial
+        }
+    }
+
     override suspend fun getIdentity(): Result<RouterIdentity> {
         val req = authenticatedRequestBuilder("/system/identity").get().build()
         return executeRequest(req).mapCatching { body ->
