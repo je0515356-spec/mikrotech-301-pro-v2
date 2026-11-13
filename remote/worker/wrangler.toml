@@ -1,0 +1,13 @@
+name = "mikroteck-remote-relay"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+
+[[durable_objects.bindings]]
+name = "ROUTERS"
+class_name = "RouterSession"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RouterSession"]
+
+# Configure ADMIN_API_TOKEN with wrangler secret put, never commit its value.

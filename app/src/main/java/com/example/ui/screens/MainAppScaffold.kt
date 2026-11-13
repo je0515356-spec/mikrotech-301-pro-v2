@@ -2,6 +2,10 @@ package com.example.ui.screens
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -99,6 +103,10 @@ fun MainAppScaffold(
             ) {
             when (currentScreen) {
                 "dashboard" -> {
+                    Column {
+                    OutlinedButton(onClick = { viewModel.navigateTo("remote") }, modifier = Modifier.fillMaxWidth()) {
+                        Text("Contrôle à distance • Cloudflare")
+                    }
                     DashboardScreen(
                         viewModel = viewModel,
                         onNavigate = { dest -> viewModel.navigateTo(dest) },
@@ -106,6 +114,10 @@ fun MainAppScaffold(
                         onOpenBatchTicket = { showBatchTicketDialog = true },
                         onOpenCreatePppoe = { showCreatePppoeDialog = true }
                     )
+                    }
+                }
+                "remote" -> {
+                    RemoteStatusScreen(onBack = { viewModel.navigateTo("dashboard") })
                 }
                 "tickets" -> {
                     TicketsScreen(

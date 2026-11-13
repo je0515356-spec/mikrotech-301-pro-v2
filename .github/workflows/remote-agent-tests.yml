@@ -1,0 +1,24 @@
+name: Remote Agent Contract Tests
+on:
+  pull_request:
+    paths:
+      - 'remote/**'
+      - '.github/workflows/remote-agent-tests.yml'
+  push:
+    branches:
+      - feature/remote-control-cloudflare-v1
+    paths:
+      - 'remote/**'
+      - '.github/workflows/remote-agent-tests.yml'
+jobs:
+  static-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run static agent contract checks
+        run: python -m unittest discover -s remote/tests -p 'test_*.py' -v
