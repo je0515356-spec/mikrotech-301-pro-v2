@@ -66,6 +66,9 @@ class DemoRouterOSClient : RouterOSClient {
         )
     )
 
+    override suspend fun getRouterSerial(): Result<String> =
+        Result.failure(IllegalStateException("Numéro de série indisponible en démonstration"))
+
     override suspend fun getIdentity(): Result<RouterIdentity> = Result.success(RouterIdentity("MIKROTECH-301-DEMO"))
 
     override suspend fun getHotspotUsers(): Result<List<HotspotUserModel>> = Result.success(hotspotUsers.toList())
