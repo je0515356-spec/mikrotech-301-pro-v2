@@ -65,6 +65,79 @@ fun DashboardScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        item {
+            Surface(
+                shape = RoundedCornerShape(24.dp),
+                color = MikrotechBlue,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.linearGradient(
+                                listOf(MikrotechBlue, Color(0xFF102B5B), Color(0xFF07152C))
+                            )
+                        )
+                        .padding(20.dp)
+                ) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Router, contentDescription = null, tint = MikrotechCyan, modifier = Modifier.size(26.dp))
+                            Spacer(Modifier.width(10.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("MIKROTECH 301", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                                Text("CENTRE DE CONTRÔLE", color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp, letterSpacing = 2.sp)
+                            }
+                            Surface(
+                                color = if (connectionStatus == ConnectionStatus.CONNECTED) MikrotechGreen.copy(alpha = 0.2f) else MikrotechOrange.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(20.dp)
+                            ) {
+                                Text(
+                                    if (connectionStatus == ConnectionStatus.CONNECTED) "● EN LIGNE" else "● HORS LIGNE",
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+                                    color = if (connectionStatus == ConnectionStatus.CONNECTED) MikrotechGreen else MikrotechOrange,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        }
+                        Text("Votre réseau, en temps réel.", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(
+                            "${routerResource.boardName}  •  RouterOS ${routerResource.version}",
+                            color = Color.White.copy(alpha = 0.72f), fontSize = 12.sp
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.15f))
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("$totalActiveClients", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
+                                Text("Clients en ligne", color = Color.White.copy(alpha = 0.7f), fontSize = 11.sp)
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("${routerResource.cpuLoad}%", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
+                                Text("CPU MikroTik", color = Color.White.copy(alpha = 0.7f), fontSize = 11.sp)
+                            }
+                            IconButton(onClick = { viewModel.refreshAll() }) {
+                                Icon(Icons.Default.Refresh, contentDescription = "Actualiser les données", tint = Color.White)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        item {
+            Text("ACCÈS RAPIDE", fontWeight = FontWeight.Bold, color = MikrotechTextPrimary, fontSize = 13.sp, letterSpacing = 1.sp)
+        }
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                DashboardQuickAction("Ticket", Icons.Default.AddCircle, MikrotechCyan, Modifier.weight(1f), onOpenCreateTicket)
+                DashboardQuickAction("Lot", Icons.Default.ConfirmationNumber, MikrotechPurple, Modifier.weight(1f), onOpenBatchTicket)
+                DashboardQuickAction("PPPoE", Icons.Default.PersonAdd, MikrotechGreen, Modifier.weight(1f), onOpenCreatePppoe)
+                DashboardQuickAction("Clients", Icons.Default.Groups, MikrotechOrange, Modifier.weight(1f)) { onNavigate("clients") }
+            }
+        }
+
         // Status banner only if disconnected
         if (connectionStatus == ConnectionStatus.DISCONNECTED || connectionStatus == ConnectionStatus.ERROR) {
             item {
@@ -515,6 +588,31 @@ fun QuickActionButton(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+        }
+    }
+}
+
+@Composable
+private fun DashboardQuickAction(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    tint: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = modifier.clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        color = MikrotechSurfaceVariant,
+        tonalElevation = 2.dp
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 15.dp, horizontal = 4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(7.dp)
+        ) {
+            Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))
+            Text(title, color = MikrotechTextPrimary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
         }
     }
 }
