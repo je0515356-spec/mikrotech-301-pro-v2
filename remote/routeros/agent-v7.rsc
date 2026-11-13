@@ -1,5 +1,6 @@
 # MIKROTECK remote agent V1 — LAB ONLY, RouterOS 7.15+ recommended.
-# Read-only heartbeat. No changes to Hotspot, PPPoE, firewall, or users.
+# Read-only, one-shot status response. No scheduler or configuration changes.
+# Tested protocol manually on hAP ac2 RouterOS 7.24.6; this full script is NOT hardware-validated.
 # Set these three globals manually in a lab terminal BEFORE running:
 # :global mkRemoteBase "https://YOUR-WORKER.workers.dev"
 # :global mkRemoteRouterId "router-test-0001"
@@ -41,11 +42,13 @@
     :return
 }
 :local idJson [:serialize to=json value=$jobId options=json.no-string-conversion]
-:local uptimeJson [:serialize to=json value=[/system resource get uptime] options=json.no-string-conversion]
-:local versionJson [:serialize to=json value=[/system resource get version] options=json.no-string-conversion]
+:local uptimeJson [:serialize to=json value=[:tostr [/system resource get uptime]] options=json.no-string-conversion]
+:local versionJson [:serialize to=json value=[:tostr [/system resource get version]] options=json.no-string-conversion]
 :local payload ("{\"id\":" . $idJson . ",\"result\":{\"status\":\"online\",\"uptime\":" . $uptimeJson . ",\"routerosVersion\":" . $versionJson . "}}")
 :onerror err in={
-    /tool fetch url=($base . "/result") http-method=post http-header-field=($headers . ",Content-Type: application/json") http-data=$payload check-certificate=yes output=none
+    :local upload [/tool fetch url=($base . "/result") http-method=post http-header-field=($headers . ",Content-Type: application/json") http-data=$payload check-certificate=yes output=user as-value]
+    :if (($upload->"status") != "finished") do={ :error "MIKROTECK: upload incomplete" }
+    :put ($upload->"data")
 } do={
     :log warning "MIKROTECK: result upload failed"
     :error "MIKROTECK: upload failed"
