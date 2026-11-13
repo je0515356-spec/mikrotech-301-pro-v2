@@ -57,7 +57,7 @@ export default {
     const isRouterRoute = (request.method === "GET" && path === "/next") ||
       (request.method === "POST" && path === "/result");
     const isAdminRoute = (request.method === "POST" && path === "/queue") ||
-      (request.method === "GET" && /^\\/result\\/[0-9a-f-]{36}$/.test(path));
+      (request.method === "GET" && /^\/result\/[0-9a-f-]{36}$/.test(path));
     if (!isRouterRoute && !isAdminRoute) return json({error:"not_found"},404);
     let tokens: Record<string,string> = {};
     if (env.ROUTER_TOKENS) {
