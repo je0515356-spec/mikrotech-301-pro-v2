@@ -63,6 +63,7 @@ fun WelcomeSplashScreen(
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     var rememberRouter by remember { mutableStateOf(true) }
+    var showWelcomeIntro by remember { mutableStateOf(true) }
 
     // Smooth one-time brand reveal; connection controls remain immediately usable.
     var revealed by remember { mutableStateOf(false) }
@@ -89,6 +90,66 @@ fun WelcomeSplashScreen(
         ),
         label = "radarAngle"
     )
+
+    if (showWelcomeIntro) {
+        val pulse by infiniteTransition.animateFloat(
+            initialValue = 0.92f,
+            targetValue = 1.08f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(1700, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "introPulse"
+        )
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(Color(0xFF050A1D), Color(0xFF10123A), Color(0xFF180A35))))
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .padding(24.dp)
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(18.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(176.dp)
+                        .scale(pulse)
+                        .border(
+                            BorderStroke(3.dp, Brush.sweepGradient(listOf(Color(0xFF17D9FF), Color(0xFFAC32FF), Color(0xFF176CFF), Color(0xFF17D9FF)))),
+                            CircleShape
+                        )
+                        .background(Color(0xFF172354).copy(alpha = 0.6f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Router, contentDescription = "MIKROTECH 301", tint = Color(0xFF25D9FF), modifier = Modifier.size(85.dp))
+                }
+                Text("MIKROTECH 301", fontSize = 29.sp, fontWeight = FontWeight.Black, color = Color.White, letterSpacing = 1.sp)
+                Text("ULTIMATE PRO", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC368FF), letterSpacing = 3.sp)
+                Text("Votre réseau. Votre business. Votre contrôle.", fontSize = 13.sp, color = Color(0xFFBAC8E9), textAlign = TextAlign.Center)
+                Spacer(Modifier.height(16.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    IntroFeature(Icons.Default.Wifi, "Hotspot")
+                    IntroFeature(Icons.Default.Security, "Sécurité")
+                    IntroFeature(Icons.Default.Analytics, "Statistiques")
+                }
+            }
+            Button(
+                onClick = { showWelcomeIntro = false },
+                modifier = Modifier.fillMaxWidth().height(56.dp).align(Alignment.BottomCenter),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6548F5)),
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Text("CONTINUER", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                Spacer(Modifier.width(10.dp))
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+            }
+        }
+        return
+    }
 
     Column(
         modifier = modifier
@@ -542,5 +603,19 @@ fun WelcomeSplashScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun IntroFeature(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String) {
+    Surface(color = Color(0xFF1A2351), shape = RoundedCornerShape(14.dp)) {
+        Column(
+            modifier = Modifier.padding(horizontal = 15.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(icon, contentDescription = null, tint = Color(0xFF24D8FF), modifier = Modifier.size(22.dp))
+            Text(title, color = Color.White, fontSize = 11.sp)
+        }
     }
 }
