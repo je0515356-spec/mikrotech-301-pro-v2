@@ -1,6 +1,7 @@
 package com.example.data.routeros
 
 data class RouterResource(
+    val serialNumber: String = "",
     val uptime: String = "00:00:00",
     val cpuLoad: Int = 0,
     val freeMemory: Long = 0L,
