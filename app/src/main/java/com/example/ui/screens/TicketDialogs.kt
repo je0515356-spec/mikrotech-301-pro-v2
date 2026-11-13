@@ -29,7 +29,7 @@ import com.example.ui.MikrotechViewModel
 import com.example.ui.theme.*
 import java.security.SecureRandom
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun CreateTicketDialog(
     viewModel: MikrotechViewModel,
