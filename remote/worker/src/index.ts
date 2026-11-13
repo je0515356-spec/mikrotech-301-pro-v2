@@ -3,6 +3,7 @@
 export interface Env {
   ROUTERS: DurableObjectNamespace;
   ADMIN_API_TOKEN: string;
+  ROUTER_TOKENS?: string; // JSON map router ID -> individual test-only bearer token
 }
 type Action = "list_hotspot" | "list_pppoe" | "router_status";
 const allowed = new Set<Action>(["list_hotspot", "list_pppoe", "router_status"]);
@@ -50,9 +51,29 @@ export default {
     const url = new URL(request.url);
     const match = url.pathname.match(/^\/v1\/routers\/([a-zA-Z0-9_-]{8,80})(\/.*)$/);
     if (!match) return json({error:"not_found"},404);
-    // Prototype only: a single server token is NOT suitable for commercial multi-tenant access.
-    // Replace with per-router credentials and authenticated owner membership before deployment.
-    if (!authorized(request,env.ADMIN_API_TOKEN)) return json({error:"unauthorized"},401);
+    // Lab transition: administrator queues/reads results; each router may only poll and submit.
+    // No customer APK access until owner-scoped authentication is implemented.
+    const path = match[2];
+    const isRouterRoute = (request.method === "GET" && path === "/next") ||
+      (request.method === "POST" && path === "/result");
+    const isAdminRoute = (request.method === "POST" && path === "/queue") ||
+      (request.method === "GET" && /^\\/result\\/[0-9a-f-]{36}$/.test(path));
+    if (!isRouterRoute && !isAdminRoute) return json({error:"not_found"},404);
+    let tokens: Record<string,string> = {};
+    if (env.ROUTER_TOKENS) {
+      try {
+        const parsed: unknown = JSON.parse(env.ROUTER_TOKENS);
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return json({error:"invalid_router_configuration"},503);
+        tokens = parsed as Record<string,string>;
+      } catch { return json({error:"invalid_router_configuration"},503); }
+    }
+    if (isRouterRoute) {
+      const routerToken = tokens[match[1]];
+      if (typeof routerToken !== "string" || routerToken.length < 32) return json({error:"router_not_enrolled"},403);
+      if (!authorized(request,routerToken)) return json({error:"unauthorized"},401);
+    } else {
+      if (!authorized(request,env.ADMIN_API_TOKEN)) return json({error:"unauthorized"},401);
+    }
     const id = env.ROUTERS.idFromName(match[1]);
     const target = new URL(request.url);
     target.pathname = match[2];
