@@ -1,0 +1,148 @@
+================================================================================
+           MIKROTECH 301 ULTIMATE PRO V2 — MADAGASCAR COMMERCIAL EDITION
+                GUIDE DE LIVRAISON, INSTALLATION & MODE D'EMPLOI
+================================================================================
+Auteur & Support Développeur : 038 28 171 00 (Appel direct & WhatsApp)
+Slogan : "Votre réseau. Votre business. Votre contrôle."
+Version : 2.0.0 Commercial Release (Pack Clé en Main pour Revendeurs & Opérateurs)
+Fichier APK inclus : MIKROTECH_301_ULTIMATE_PRO.apk
+Mot de passe Master Administrateur : 0382817100Eric.
+================================================================================
+
+1. CONTENU DU PACK DE LIVRAISON
+--------------------------------------------------------------------------------
+Ce dossier contient tous les éléments nécessaires à l'exploitation commerciale
+de votre système MikroTik Hotspot & PPPoE :
+
+  * MIKROTECH_301_ULTIMATE_PRO.apk
+    L'application Android officielle complète, prête à être installée sur n'importe
+    quel smartphone ou tablette Android (Android 8.0 à Android 15+).
+
+  * GUIDE_DE_LIVRAISON_ET_UTILISATION.txt (Ce fichier)
+    Le manuel complet d'exploitation, configuration des tickets, suivi des clients
+    et maintenance sans perte de configuration.
+
+
+2. INSTALLATION SUR SMARTPHONE OU TABLETTE ANDROID
+--------------------------------------------------------------------------------
+1. Copiez le fichier "MIKROTECH_301_ULTIMATE_PRO.apk" sur votre téléphone
+   (via câble USB, WhatsApp, carte SD ou téléchargement direct).
+2. Appuyez sur le fichier APK pour lancer l'installation.
+3. Si Android vous demande d'autoriser l'installation d'applications provenant
+   de cette source (Sources inconnues), activez l'autorisation puis appuyez sur
+   "Installer".
+4. Une fois installée, l'icône "MIKROTECH 301" apparaît sur votre écran d'accueil.
+
+
+3. PREMIER DÉMARRAGE & CONNEXION AU ROUTEUR MIKROTIK
+--------------------------------------------------------------------------------
+1. Connectez votre smartphone au réseau Wi-Fi de votre routeur MikroTik.
+2. Ouvrez l'application MIKROTECH 301.
+3. L'écran d'accueil officiel s'affiche avec le radar de détection Wi-Fi.
+4. L'adresse par défaut du routeur (192.168.88.1) et le port API (8728) sont
+   pré-remplis automatiquement.
+5. Entrez votre identifiant MikroTik (par défaut : "admin", mot de passe vide ou
+   votre mot de passe personnalisé).
+6. Cochez "Mémoriser ce routeur pour les prochaines ouvertures".
+7. Appuyez sur "Se connecter au routeur".
+8. L'application enregistre le routeur dans sa base de données locale sécurisée.
+   Aux prochains démarrages, l'application se reconnectera TOUTE SEULE sans
+   jamais vous redemander les identifiants !
+
+
+4. PERSONNALISATION DU TICKET POUR VOTRE ÉTABLISSEMENT (CYBER / HÔTEL / BOUTIQUE)
+--------------------------------------------------------------------------------
+IMPORTANT : Vous pouvez remplacer le nom par défaut par le nom de VOTRE propre
+commerce (ex: "CYBER EXPRESS MAHAJANGA", "HÔTEL RESTAURANT DE LA PAIX", etc.).
+
+Pour personnaliser vos tickets :
+1. Dans l'application, allez dans "Paramètres" -> "Personnalisation des Tickets & Reçus".
+   (Ou appuyez sur le bouton "⚙️ Mon Établissement" directement depuis l'écran Tickets).
+2. Remplissez vos coordonnées :
+   - Nom de votre Établissement : Votre enseigne commerciale
+   - Téléphone pour Recharges : Le numéro sur lequel vos clients peuvent vous appeler
+     ou envoyer leur paiement mobile money (Mvola / Airtel / Orange Money).
+   - Adresse / Quartier : La localisation de votre point de vente.
+   - Message d'accueil / Slogan : Ex. "Connexion Internet Fibre Haut Débit".
+   - Note de bas de ticket : Ex. "Tickets disponibles à la caisse. Merci de votre fidélité !"
+3. Vous disposez d'un aperçu en direct du ticket thermique à l'écran.
+4. Appuyez sur "Enregistrer la Personnalisation des Tickets".
+
+DÉSORMAIS, TOUS LES TICKETS IMPRIMÉS, PARTAGÉS SUR WHATSAPP OU ENVOYÉS PAR SMS
+PORTERONT VOTRE PROPRE NOM D'ÉTABLISSEMENT ET VOTRE NUMÉRO COMMERCIAL !
+
+
+5. SUIVI DES CLIENTS PAR MOIS, JOURS RESTANTS & CONSOMMATION DÉJÀ CONSOMMÉE
+--------------------------------------------------------------------------------
+L'onglet "Clients" intègre un tableau de bord complet dédié aux abonnés :
+
+1. Onglet "SUIVI ABONNÉS & MOIS" :
+   - Liste de tous vos abonnés (Hotspot mensuels et abonnés PPPoE).
+   - Affichage en temps réel des JOURS RESTANTS avant expiration :
+     * Vert : Plus de 5 jours restants (Abonnement en règle).
+     * Orange vif : Moins de 5 jours restants (Alerte relance nécessaire).
+     * Rouge : Expiré (L'échéance est dépassée).
+   - Affichage de la CONSOMMATION DÉJÀ CONSOMMÉE :
+     * Volume de données consommé (Go téléchargés + Go envoyés).
+     * Temps d'utilisation déjà consommé (ex: 14 jours consommés sur 30 jours).
+     * Jauge visuelle de consommation en pourcentage.
+   - Montant mensuel en Ariary (Ar) et mode de règlement.
+
+2. Actions rapides en 1 clic pour chaque client :
+   - "🔄 Renouveler +1 Mois" :
+     Prolonge automatiquement l'abonnement de +30 jours, réactive la ligne sur le
+     routeur si elle était suspendue, et enregistre automatiquement le paiement
+     dans votre caisse (onglet Chiffre d'Affaires).
+   - "💬 Relancer sur WhatsApp" :
+     Ouvre WhatsApp avec un message professionnel pré-rempli au nom de votre
+     établissement, rappelant au client ses jours restants, son quota consommé
+     et le numéro pour payer sa recharge.
+   - "📞 Appeler" :
+     Compose immédiatement le numéro de l'abonné pour le joindre par téléphone.
+   - "➕ Ajouter un Abonné" :
+     Enregistre un nouveau client avec son nom, son numéro, son forfait mensuel,
+     son prix en Ariary et calcule automatiquement la date d'échéance.
+
+
+6. FONCTIONNEMENT DE LA PROTECTION HAUTE DISPONIBILITÉ (ANTI-COUPURE DE COURANT)
+--------------------------------------------------------------------------------
+L'application intègre un moteur de protection contre les coupures inopinées de courant :
+
+* Problème classique sans MIKROTECH 301 :
+  Lorsqu'un client achète un ticket d'1 heure et qu'une coupure électrique survient
+  après 30 minutes, le routeur redémarre à zéro et le client récupère 1 heure entière,
+  ce qui vous fait perdre de l'argent ; ou inversement le ticket expire brutalement.
+
+* Solution MIKROTECH 301 (Haute Disponibilité & Anti-Coupure) :
+  Le routeur synchronise en continu l'heure réseau sécurisée et sauvegarde l'état
+  exact du temps net consommé par chaque ticket.
+  Lors du rétablissement du courant, chaque ticket reprend EXACTEMENT là où il en était
+  (les 30 minutes restantes sont respectées sans remise à zéro).
+  Cette protection fonctionne de manière 100% autonome et transparente en tâche de fond.
+
+
+7. GESTION DES TICKETS HOTSPOT EN LOT (BATCH GENERATION)
+--------------------------------------------------------------------------------
+Pour imprimer des tickets à l'avance et les vendre à votre comptoir :
+1. Dans l'onglet "Tickets", appuyez sur "Générer un Lot".
+2. Choisissez la quantité (10, 20, 50, 100 tickets).
+3. Choisissez le forfait (ex: 1 Heure, 3 Heures, 24 Heures, 30 Jours) et le prix en Ariary.
+4. L'application génère instantanément tous les comptes sur le MikroTik.
+5. Vous pouvez imprimer les tickets ou les exporter pour impression thermique ESC/POS.
+
+
+8. MOT DE PASSE D'ADMINISTRATION & SÉCURITÉ
+--------------------------------------------------------------------------------
+Pour accéder aux fonctions d'administration avancées et de configuration :
+  Mot de passe Administrateur Master : 0382817100Eric.
+
+
+9. SUPPORT TECHNIQUE & ASSISTANCE COMMERCIALE
+--------------------------------------------------------------------------------
+Pour toute question d'installation, mise à niveau ou assistance technique :
+  Contact Développeur : 038 28 171 00 (Madagascar)
+  Disponible 7j/7 par Appel direct et WhatsApp.
+
+================================================================================
+          MIKROTECH 301 — Votre réseau. Votre business. Votre contrôle.
+================================================================================

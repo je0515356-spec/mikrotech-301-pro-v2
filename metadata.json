@@ -1,0 +1,6 @@
+{
+  "name": "MIKROTECH 301",
+  "description": "Application professionnelle de gestion MikroTik Hotspot & PPPoE pour Madagascar",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
