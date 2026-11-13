@@ -255,6 +255,15 @@ class RouterOSBinarySocketClient(
         }
     }
 
+    override suspend fun getRouterSerial(): Result<String> = withContext(Dispatchers.IO) {
+        runCatching {
+            val serial = executeCommand(listOf("/system/routerboard/print"))
+                .firstOrNull()?.get("serial-number").orEmpty().trim()
+            require(serial.isNotEmpty()) { "Numéro de série MikroTik indisponible" }
+            serial
+        }
+    }
+
     override suspend fun getIdentity(): Result<RouterIdentity> = withContext(Dispatchers.IO) {
         try {
             val list = executeCommand(listOf("/system/identity/print"))
