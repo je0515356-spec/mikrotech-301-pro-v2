@@ -1,0 +1,8 @@
+name = "mikroteck-remote-api"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+# Set CLOUDFLARE_D1_DATABASE_ID in the GitHub environment variable.
+# Wrangler interpolates environment variables in this config only when supported;
+# the deploy workflow writes the D1 binding config from the variable at runtime.
