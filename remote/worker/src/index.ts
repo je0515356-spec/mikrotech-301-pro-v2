@@ -49,6 +49,7 @@ export class RouterSession {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/health") return json({service:"mikroteck-relay",status:"online",routerConnected:false});
     const match = url.pathname.match(/^\/v1\/routers\/([a-zA-Z0-9_-]{8,80})(\/.*)$/);
     if (!match) return json({error:"not_found"},404);
     // Lab transition: administrator queues/reads results; each router may only poll and submit.
