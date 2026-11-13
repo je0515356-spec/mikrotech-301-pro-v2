@@ -182,6 +182,15 @@ class MikrotechViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun refreshHotspotProfiles() {
+        viewModelScope.launch {
+            repository.getHotspotProfiles().fold(
+                onSuccess = { _hotspotProfiles.value = it },
+                onFailure = { _toastMessage.value = "Impossible de charger les profils Hotspot : ${it.localizedMessage}" }
+            )
+        }
+    }
+
     fun scanLocalMikrotik() {
         viewModelScope.launch {
             _isLoading.value = true
