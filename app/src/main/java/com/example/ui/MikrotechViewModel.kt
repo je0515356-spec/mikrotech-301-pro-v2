@@ -100,16 +100,16 @@ class MikrotechViewModel(application: Application) : AndroidViewModel(applicatio
     val licenseInfo: StateFlow<LicenseEntity> = repository.getLicenseInfo()
         .map {
             it ?: LicenseEntity(
-                licenseKey = "MT301-ULTIMATE-MDG-2026",
+                licenseKey = "",
                 planType = "ULTIMATE",
-                androidInstallId = "ANDR-88319-MG",
-                isActive = true
+                androidInstallId = "",
+                isActive = false
             )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), LicenseEntity(
-            licenseKey = "MT301-ULTIMATE-MDG-2026",
+            licenseKey = "",
             planType = "ULTIMATE",
-            androidInstallId = "ANDR-88319-MG",
+            androidInstallId = "",
             isActive = true
         ))
 
@@ -608,18 +608,9 @@ class MikrotechViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun activateLicense(key: String, plan: String) {
-        viewModelScope.launch {
-            val updated = LicenseEntity(
-                id = 1,
-                licenseKey = key.trim(),
-                planType = plan,
-                androidInstallId = licenseInfo.value.androidInstallId,
-                activationDate = System.currentTimeMillis(),
-                isActive = true
-            )
-            repository.saveLicense(updated)
-            _toastMessage.value = "Licence $plan activée avec succès !"
-        }
+        // Activation must be verified cryptographically against the RouterOS serial.
+        // Never accept arbitrary text as a valid commercial license.
+        _toastMessage.value = "Activation indisponible : validation sécurisée en cours de développement."
     }
 
     fun installAutonomousExpirationScript() {
