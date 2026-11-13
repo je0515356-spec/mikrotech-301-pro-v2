@@ -54,6 +54,9 @@ fun CreateTicketDialog(
     }
     LaunchedEffect(Unit) { viewModel.refreshHotspotProfiles() }
     var uptimeLimit by remember { mutableStateOf("1h") }
+    var quotaGb by remember { mutableStateOf("") }
+    var quotaEnabled by remember { mutableStateOf(false) }
+    var customDuration by remember { mutableStateOf(false) }
     var priceText by remember { mutableStateOf("500") }
     var comment by remember(portalConfig) {
         mutableStateOf("Ticket ${portalConfig.zoneName} • Tél: ${portalConfig.contactPhone}")
@@ -68,7 +71,8 @@ fun CreateTicketDialog(
         "1d" to "24 Heures",
         "3d" to "3 Jours",
         "7d" to "7 Jours",
-        "30d" to "30 Jours"
+        "30d" to "30 Jours",
+        "0s" to "Sans limite"
     )
 
     val pricePresets = listOf(500L, 1000L, 2000L, 2500L, 5000L, 10000L)
@@ -162,20 +166,21 @@ fun CreateTicketDialog(
                 // Duration Presets
                 Text("Durée de validité :", fontSize = 12.sp, color = MikrotechTextSecondary)
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Row(
+                    androidx.compose.foundation.layout.FlowRow(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        durationPresets.take(4).forEach { (code, label) ->
+                        durationPresets.forEach { (code, label) ->
                             val isSelected = uptimeLimit == code
                             Surface(
                                 color = if (isSelected) MikrotechCyan.copy(alpha = 0.2f) else MikrotechSurfaceVariant,
                                 border = if (isSelected) BorderStroke(1.dp, MikrotechCyan) else null,
                                 shape = RoundedCornerShape(8.dp),
                                 modifier = Modifier
-                                    .weight(1f)
+                                    .width(95.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .clickable { uptimeLimit = code }
+                                    .clickable { uptimeLimit = code; customDuration = false }
                             ) {
                                 Text(
                                     text = label,
@@ -192,6 +197,36 @@ fun CreateTicketDialog(
                         }
                     }
                 }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = customDuration, onCheckedChange = { customDuration = it })
+                    Text("Durée personnalisée (ex : 45d, 2w, 10h)", fontSize = 12.sp)
+                }
+                if (customDuration) {
+                    OutlinedTextField(
+                        value = uptimeLimit,
+                        onValueChange = { uptimeLimit = it },
+                        label = { Text("Durée RouterOS") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+                Text("Durée = temps de connexion cumulé. Pour une expiration à date fixe, une gestion séparée est nécessaire.", fontSize = 11.sp, color = MikrotechTextSecondary)
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = quotaEnabled, onCheckedChange = { quotaEnabled = it })
+                    Text("Limiter le volume de données (Go)", fontSize = 12.sp)
+                }
+                if (quotaEnabled) {
+                    OutlinedTextField(
+                        value = quotaGb,
+                        onValueChange = { quotaGb = it.filter { c -> c.isDigit() } },
+                        label = { Text("Quota total en Go (ex : 10)") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+                Text("Débit : celui du profil MikroTik sélectionné. Aucune limite supplémentaire n'est imposée par ce formulaire.", fontSize = 11.sp, color = MikrotechTextSecondary)
 
                 // Price Presets & input
                 Text("Prix du ticket (Ariary) :", fontSize = 12.sp, color = MikrotechTextSecondary)
@@ -341,7 +376,7 @@ fun CreateTicketDialog(
                             password = password.trim(),
                             profile = selectedProfile,
                             uptimeLimit = uptimeLimit,
-                            dataLimitBytes = 0L,
+                            dataLimitBytes = if (quotaEnabled) (quotaGb.toLongOrNull() ?: 0L).coerceAtMost(Long.MAX_VALUE / 1073741824L) * 1073741824L else 0L,
                             priceAriary = price,
                             comment = comment,
                             recordAsSale = recordAsSale,
@@ -376,6 +411,9 @@ fun BatchTicketDialog(
         mutableStateOf(profiles.firstOrNull()?.name ?: "1H_500Ar")
     }
     var uptimeLimit by remember { mutableStateOf("1h") }
+    var quotaGb by remember { mutableStateOf("") }
+    var quotaEnabled by remember { mutableStateOf(false) }
+    var customDuration by remember { mutableStateOf(false) }
     var priceText by remember { mutableStateOf("500") }
 
     val batchCounts = listOf(10, 20, 50, 100)
@@ -461,6 +499,21 @@ fun BatchTicketDialog(
                     onSelected = { selectedProfile = it }
                 )
 
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = quotaEnabled, onCheckedChange = { quotaEnabled = it })
+                    Text("Quota de données par ticket (Go)", fontSize = 12.sp)
+                }
+                if (quotaEnabled) {
+                    OutlinedTextField(
+                        value = quotaGb,
+                        onValueChange = { quotaGb = it.filter { c -> c.isDigit() } },
+                        label = { Text("Go par ticket") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+                Text("Sans quota : illimité en volume. Débit : défini par le profil.", fontSize = 11.sp, color = MikrotechTextSecondary)
+
                 OutlinedTextField(
                     value = uptimeLimit,
                     onValueChange = { uptimeLimit = it },
@@ -528,7 +581,7 @@ fun BatchTicketDialog(
                             prefix = prefix,
                             profile = selectedProfile,
                             uptimeLimit = uptimeLimit,
-                            dataLimitBytes = 0L,
+                            dataLimitBytes = if (quotaEnabled) (quotaGb.toLongOrNull() ?: 0L).coerceAtMost(Long.MAX_VALUE / 1073741824L) * 1073741824L else 0L,
                             priceAriary = price
                         )
                         onDismiss()
