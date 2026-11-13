@@ -183,17 +183,6 @@ fun SettingsMenuMain(
 
         item {
             SettingsMenuItem(
-                title = "Licence Commerciale & À Propos",
-                subtitle = "MIKROTECH 301 Madagascar • 038 28 171 00",
-                icon = Icons.Default.VerifiedUser,
-                badge = "ULTIMATE",
-                badgeColor = MikrotechPurple,
-                onClick = { onNavigateTo("license") }
-            )
-        }
-
-        item {
-            SettingsMenuItem(
                 title = "Générateur de Licences Client",
                 subtitle = "Créer et délivrer des clés STARTER, PRO, ULTIMATE",
                 icon = Icons.Default.Key,
