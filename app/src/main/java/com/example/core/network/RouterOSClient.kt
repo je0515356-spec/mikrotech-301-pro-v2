@@ -6,6 +6,7 @@ interface RouterOSClient {
     suspend fun testConnection(): Result<RouterResource>
     suspend fun getResource(): Result<RouterResource>
     suspend fun getIdentity(): Result<RouterIdentity>
+    suspend fun getRouterSerial(): Result<String>
 
     // Hotspot Users (Tickets)
     suspend fun getHotspotUsers(): Result<List<HotspotUserModel>>
