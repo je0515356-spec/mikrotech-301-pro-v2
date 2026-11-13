@@ -24,15 +24,26 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      # The GitHub Ubuntu runner already provides Android SDK command-line tools.
-      # setup-android@v3 invokes the removed legacy 'tools' SDK package and fails.
+      - name: Configure Android SDK command line tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -path '*/bin/sdkmanager' -type f 2>/dev/null | sort -V | tail -n 1)"
+          if [[ -z "$SDKMANAGER" ]]; then
+            echo 'No Android sdkmanager found in installed command line tools' >&2
+            exit 1
+          fi
+          echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
+          echo "Using $SDKMANAGER"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.3.1'
       - name: Install Android SDK packages
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager --install "platforms;android-36" "build-tools;36.0.0"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0"
       - name: Build debug APK (not production-ready)
         run: gradle --no-daemon :app:assembleDebug --stacktrace
       - name: Upload debug APK only if build succeeded
