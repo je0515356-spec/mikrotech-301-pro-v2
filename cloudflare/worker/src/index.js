@@ -67,11 +67,48 @@ export default {
         await env.DB.prepare("UPDATE routers SET last_seen = CURRENT_TIMESTAMP WHERE id = ?").bind(id).run();
         return json({ ok: true, router_id: id });
       }
+      if (request.method === "POST" && url.pathname === "/admin/commands") {
+        const secret = env.ADMIN_BOOTSTRAP_SECRET;
+        if (!secret || secret.length < 32 || !equalConstantTime(bearer(request), secret)) return json({ error: "Unauthorized" }, 401);
+        const body = await readJson(request);
+        if (!/^[a-zA-Z0-9_-]{8,64}$/.test(body.router_id || "") ||
+            body.action !== "router.identity" || (body.payload != null && Object.keys(body.payload).length !== 0))
+          return json({ error: "Only read-only router.identity is supported" }, 400);
+        const exists = await env.DB.prepare("SELECT id FROM routers WHERE id = ?").bind(body.router_id).first();
+        if (!exists) return json({ error: "Router not found" }, 404);
+        const id = crypto.randomUUID();
+        await env.DB.prepare("INSERT INTO commands (id,router_id,action,payload,status,expires_at) VALUES (?,?,?,'{}','pending',datetime('now','+5 minutes'))")
+          .bind(id, body.router_id, "router.identity").run();
+        return json({ command_id: id, status: "pending" }, 201);
+      }
+      if (request.method === "GET" && /^\\/admin\\/commands\\/[0-9a-f-]{36}$/.test(url.pathname)) {
+        const secret = env.ADMIN_BOOTSTRAP_SECRET;
+        if (!secret || secret.length < 32 || !equalConstantTime(bearer(request), secret)) return json({ error: "Unauthorized" }, 401);
+        const id = url.pathname.split("/").pop();
+        const command = await env.DB.prepare("SELECT id,router_id,action,status,result,created_at,expires_at FROM commands WHERE id = ?").bind(id).first();
+        return command ? json(command) : json({ error: "Not found" }, 404);
+      }
+      if (request.method === "POST" && url.pathname === "/agent/ack") {
+        const id = await agent(request, env);
+        if (!id) return json({ error: "Unauthorized" }, 401);
+        const body = await readJson(request);
+        if (!/^[0-9a-f-]{36}$/.test(body.command_id || "") ||
+            !["success", "failed"].includes(body.status) ||
+            typeof body.result !== "string" || body.result.length > 512)
+          return json({ error: "Invalid acknowledgement" }, 400);
+        const updated = await env.DB.prepare(
+          "UPDATE commands SET status = ?, result = ? WHERE id = ? AND router_id = ? AND action = 'router.identity' AND status = 'running'"
+        ).bind(body.status, body.result, body.command_id, id).run();
+        return updated.meta.changes === 1 ? json({ ok: true }) : json({ error: "Command not running" }, 409);
+      }
       if (request.method === "GET" && url.pathname === "/agent/poll") {
         const id = await agent(request, env);
         if (!id) return json({ error: "Unauthorized" }, 401);
-        // No command execution until authorization, anti-replay and ACK are implemented and tested.
-        return json({ router_id: id, commands: [] });
+        await env.DB.prepare("UPDATE commands SET status = 'expired' WHERE router_id = ? AND status = 'pending' AND expires_at <= CURRENT_TIMESTAMP").bind(id).run();
+        const cmd = await env.DB.prepare("SELECT id,action FROM commands WHERE router_id = ? AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP AND action = 'router.identity' ORDER BY created_at ASC LIMIT 1").bind(id).first();
+        if (!cmd) return json({ router_id: id, commands: [] });
+        const claimed = await env.DB.prepare("UPDATE commands SET status = 'running' WHERE id = ? AND router_id = ? AND status = 'pending'").bind(cmd.id,id).run();
+        return json({ router_id: id, commands: claimed.meta.changes === 1 ? [cmd] : [] });
       }
       return json({ error: "Not found" }, 404);
     } catch (e) {
