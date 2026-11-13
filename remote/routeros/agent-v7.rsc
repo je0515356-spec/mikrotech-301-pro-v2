@@ -13,7 +13,9 @@
 :if (($response->"status") != "finished") do={ :error "MIKROTECK: poll failed" }
 :local parsed [:deserialize from=json value=($response->"data")]
 :local job ($parsed->"job")
-:if ([:typeof $job] != "array") do={ :put "MIKROTECK: no pending job"; :return }
+:if ([:typeof $job] != "array") do={
+    :put "MIKROTECK: no pending job"
+} else={
 :local jobId ($job->"id")
 :local action ($job->"action")
 :if (([:typeof $jobId] != "str") || ([:len $jobId] != 36)) do={ :error "MIKROTECK: invalid job id" }
@@ -25,3 +27,4 @@
 :local upload [/tool fetch url=($base . "/result") http-method=post http-header-field=($headers . ",Content-Type: application/json") http-data=$payload check-certificate=yes output=user as-value]
 :if (($upload->"status") != "finished") do={ :error "MIKROTECK: upload failed" }
 :put ($upload->"data")
+}
