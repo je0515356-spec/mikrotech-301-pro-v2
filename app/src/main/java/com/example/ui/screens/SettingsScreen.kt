@@ -1434,7 +1434,7 @@ fun LicenseSubScreen(
                     color = MikrotechGreen.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("ACTIVE & VALIDE", color = MikrotechGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                    Text(if (license.isActive) "ENREGISTRÉE (NON VÉRIFIÉE)" else "NON ACTIVÉE", color = MikrotechGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
                 }
             }
 
@@ -1472,7 +1472,7 @@ fun LicenseSubScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
             Text("Clé active : ${license.licenseKey}", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = MikrotechTextSecondary)
-            Text("Formule : ${license.planType} • Perpétuelle & Sans abonnement cloud", fontSize = 11.sp, color = MikrotechGreen)
+            Text("Formule : ${license.planType} • Validation routeur non disponible", fontSize = 11.sp, color = MikrotechGreen)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -1555,225 +1555,14 @@ fun LicenseSubScreen(
             }
         }
 
-        // Developer License Generator Tool
-        var showGeneratorDialog by remember { mutableStateOf(false) }
-
-        LuxuryCard(borderColor = MikrotechCyan) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Générateur de Licences MIKROTECH 301", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MikrotechCyan)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Outil réservé au développeur/vendeur pour créer et délivrer les clés de licence officielles aux acheteurs de routeurs.",
-                        fontSize = 11.sp,
-                        color = MikrotechTextSecondary
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Button(
-                onClick = { showGeneratorDialog = true },
-                colors = ButtonDefaults.buttonColors(containerColor = MikrotechBlue),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.AddModerator, contentDescription = null)
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Générer une Clé pour un Client", fontWeight = FontWeight.Bold)
-            }
-
-            if (showGeneratorDialog) {
-                val context = LocalContext.current
-                val clipboardManager = LocalClipboardManager.current
-                var masterPin by remember { mutableStateOf("") }
-                var showPassword by remember { mutableStateOf(false) }
-                var isUnlocked by remember { mutableStateOf(false) }
-                var clientInstallId by remember { mutableStateOf("") }
-                var genPlan by remember { mutableStateOf("ULTIMATE PRO") }
-                var generatedKeyResult by remember { mutableStateOf("") }
-                var pinError by remember { mutableStateOf(false) }
-
-                Dialog(onDismissRequest = { showGeneratorDialog = false }) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, MikrotechCyan),
-                        modifier = Modifier.fillMaxWidth().padding(4.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(20.dp).verticalScroll(rememberScrollState()),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Text("ESPACE DÉVELOPPEUR MIKROTECH 301", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MikrotechCyan)
-
-                            if (!isUnlocked) {
-                                Text("Accès sécurisé réservé au propriétaire (038 28 171 00).\nVeuillez saisir votre Mot de passe Maître :", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-
-                                OutlinedTextField(
-                                    value = masterPin,
-                                    onValueChange = {
-                                        masterPin = it
-                                        pinError = false
-                                    },
-                                    label = { Text("Mot de passe Développeur") },
-                                    placeholder = { Text("Saisissez votre mot de passe") },
-                                    isError = pinError,
-                                    singleLine = true,
-                                    visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                                    trailingIcon = {
-                                        IconButton(onClick = { showPassword = !showPassword }) {
-                                            Icon(
-                                                imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                                contentDescription = "Afficher/Masquer le mot de passe"
-                                            )
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-
-                                if (pinError) {
-                                    Text("Mot de passe incorrect. Accès refusé.", color = MikrotechRed, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                }
-
-                                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                                    TextButton(onClick = { showGeneratorDialog = false }) { Text("Annuler") }
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Button(
-                                        onClick = {
-                                            val entered = masterPin.trim()
-                                            if (entered == "0382817100Eric." || entered == "0382817100Eric") {
-                                                isUnlocked = true
-                                                pinError = false
-                                            } else {
-                                                pinError = true
-                                            }
-                                        },
-                                        colors = ButtonDefaults.buttonColors(containerColor = MikrotechGreen)
-                                    ) {
-                                        Text("Déverrouiller le Générateur", fontWeight = FontWeight.Bold)
-                                    }
-                                }
-                            } else {
-                                Text("Saisissez l'ID Android ou le numéro de série du MikroTik du client :", fontSize = 11.sp, color = MikrotechGreen)
-
-                                OutlinedTextField(
-                                    value = clientInstallId,
-                                    onValueChange = { clientInstallId = it },
-                                    label = { Text("ID Android ou Serial MikroTik") },
-                                    placeholder = { Text("ex: ANDR-88319-MG ou RBD52G") },
-                                    singleLine = true,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-
-                            Text("Formule à délivrer :", fontSize = 11.sp, color = MikrotechTextSecondary)
-                            val plans = listOf("STARTER", "BUSINESS PRO", "ULTIMATE PRO")
-                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                                plans.forEach { pl ->
-                                    val isSel = genPlan == pl
-                                    Surface(
-                                        color = if (isSel) MikrotechBlue else MikrotechSurfaceVariant,
-                                        shape = RoundedCornerShape(6.dp),
-                                        modifier = Modifier.weight(1f).clickable { genPlan = pl }
-                                    ) {
-                                        Text(
-                                            text = pl,
-                                            fontSize = 9.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isSel) Color.White else MikrotechTextSecondary,
-                                            modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth(),
-                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                                        )
-                                    }
-                                }
-                            }
-
-                            Button(
-                                onClick = {
-                                    val tag = when (genPlan) {
-                                        "STARTER" -> "STR"
-                                        "BUSINESS PRO" -> "PRO"
-                                        else -> "ULT"
-                                    }
-                                    val suffix = (1000 + (System.currentTimeMillis() % 9000)).toString()
-                                    val cleanId = clientInstallId.replace(Regex("[^A-Za-z0-9]"), "").takeLast(5).ifEmpty { "MDG" }.uppercase()
-                                    generatedKeyResult = "MT301-$tag-$cleanId-$suffix"
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = MikrotechGreen),
-                                shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Calculer la Clé de Licence", fontWeight = FontWeight.Bold)
-                            }
-
-                            if (generatedKeyResult.isNotEmpty()) {
-                                Surface(
-                                    color = Color(0xFF091122),
-                                    shape = RoundedCornerShape(8.dp),
-                                    border = BorderStroke(1.dp, MikrotechGreen),
-                                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("CLÉ OFFICIELLE GÉNÉRÉE :", fontSize = 10.sp, color = MikrotechTextMuted)
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = generatedKeyResult,
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Black,
-                                            fontFamily = FontFamily.Monospace,
-                                            color = MikrotechGreen
-                                        )
-                                        Spacer(modifier = Modifier.height(10.dp))
-                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                            Button(
-                                                onClick = {
-                                                    clipboardManager.setText(AnnotatedString(generatedKeyResult))
-                                                },
-                                                colors = ButtonDefaults.buttonColors(containerColor = MikrotechSurfaceVariant),
-                                                border = BorderStroke(1.dp, MikrotechCardBorder),
-                                                shape = RoundedCornerShape(6.dp),
-                                                modifier = Modifier.weight(1f)
-                                            ) {
-                                                Text("Copier", fontSize = 11.sp, color = MikrotechCyan)
-                                            }
-
-                                            Button(
-                                                onClick = {
-                                                    val shareText = "Voici votre clé de licence MIKROTECH 301 ($genPlan) : $generatedKeyResult\nAssistance : 038 28 171 00"
-                                                    val sendIntent = Intent.createChooser(
-                                                        Intent().apply {
-                                                            action = Intent.ACTION_SEND
-                                                            putExtra(Intent.EXTRA_TEXT, shareText)
-                                                            type = "text/plain"
-                                                        },
-                                                        "Envoyer Clé de Licence"
-                                                    )
-                                                    context.startActivity(sendIntent)
-                                                },
-                                                colors = ButtonDefaults.buttonColors(containerColor = MikrotechBlue),
-                                                shape = RoundedCornerShape(6.dp),
-                                                modifier = Modifier.weight(1f)
-                                            ) {
-                                                Text("Partager", fontSize = 11.sp)
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            }
-
-                            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                                TextButton(onClick = { showGeneratorDialog = false }) { Text("Fermer") }
-                            }
-                        }
-                    }
-                }
-            }
+        LuxuryCard(borderColor = MikrotechPurple) {
+            Text("LICENCES ROUTEUR — EN PRÉPARATION", color = MikrotechPurple, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "La génération et l'activation sécurisées par numéro de série MikroTik ne sont pas encore disponibles. Aucun code non vérifié ne doit être vendu ou annoncé comme actif.",
+                color = MikrotechTextSecondary,
+                fontSize = 12.sp
+            )
         }
 
         CommercialSignatureCard()
