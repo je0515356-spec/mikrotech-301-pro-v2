@@ -47,6 +47,12 @@ fun CreateTicketDialog(
     var selectedProfile by remember {
         mutableStateOf(profiles.firstOrNull()?.name ?: "1H_500Ar")
     }
+    LaunchedEffect(profiles) {
+        if (profiles.isNotEmpty() && profiles.none { it.name == selectedProfile }) {
+            selectedProfile = profiles.first().name
+        }
+    }
+    LaunchedEffect(Unit) { viewModel.refreshHotspotProfiles() }
     var uptimeLimit by remember { mutableStateOf("1h") }
     var priceText by remember { mutableStateOf("500") }
     var comment by remember(portalConfig) {
@@ -146,37 +152,12 @@ fun CreateTicketDialog(
                         .testTag("input_ticket_password")
                 )
 
-                // Profile Selector
-                Text("Profil Hotspot :", fontSize = 12.sp, color = MikrotechTextSecondary)
-                val availableProfiles = if (profiles.isNotEmpty()) profiles.map { it.name } else listOf("default", "1H_500Ar", "3H_1000Ar", "24H_2500Ar")
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    availableProfiles.take(3).forEach { prof ->
-                        val isSelected = selectedProfile == prof
-                        Surface(
-                            color = if (isSelected) MikrotechBlue else MikrotechSurfaceVariant,
-                            shape = RoundedCornerShape(8.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { selectedProfile = prof }
-                        ) {
-                            Text(
-                                text = prof,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                                color = if (isSelected) Color.White else MikrotechTextSecondary,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                maxLines = 1
-                            )
-                        }
-                    }
-                }
+                // Always show every profile returned by the connected MikroTik.
+                HotspotProfilePicker(
+                    profiles = profiles.map { it.name },
+                    selected = selectedProfile,
+                    onSelected = { selectedProfile = it }
+                )
 
                 // Duration Presets
                 Text("Durée de validité :", fontSize = 12.sp, color = MikrotechTextSecondary)
@@ -474,6 +455,12 @@ fun BatchTicketDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
+                HotspotProfilePicker(
+                    profiles = profiles.map { it.name },
+                    selected = selectedProfile,
+                    onSelected = { selectedProfile = it }
+                )
+
                 OutlinedTextField(
                     value = uptimeLimit,
                     onValueChange = { uptimeLimit = it },
@@ -556,6 +543,51 @@ fun BatchTicketDialog(
                     Text("Générer $count tickets maintenant", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun HotspotProfilePicker(
+    profiles: List<String>,
+    selected: String,
+    onSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text("Profil Hotspot", fontSize = 12.sp, color = MikrotechTextSecondary)
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it && profiles.isNotEmpty() }
+        ) {
+            OutlinedTextField(
+                value = if (profiles.isEmpty()) "Aucun profil disponible" else selected,
+                onValueChange = {},
+                readOnly = true,
+                enabled = profiles.isNotEmpty(),
+                label = { Text("Choisir un profil du routeur") },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                singleLine = true
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                profiles.distinct().forEach { profileName ->
+                    DropdownMenuItem(
+                        text = { Text(profileName) },
+                        onClick = {
+                            onSelected(profileName)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+        if (profiles.isEmpty()) {
+            Text("Vérifiez la connexion au routeur et actualisez les profils.", fontSize = 11.sp, color = MikrotechOrange)
         }
     }
 }
