@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -62,6 +64,20 @@ fun WelcomeSplashScreen(
     var showPassword by remember { mutableStateOf(false) }
     var rememberRouter by remember { mutableStateOf(true) }
 
+    // Smooth one-time brand reveal; connection controls remain immediately usable.
+    var revealed by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { revealed = true }
+    val brandScale by animateFloatAsState(
+        targetValue = if (revealed) 1f else 0.82f,
+        animationSpec = tween(durationMillis = 850, easing = FastOutSlowInEasing),
+        label = "brandScale"
+    )
+    val brandAlpha by animateFloatAsState(
+        targetValue = if (revealed) 1f else 0f,
+        animationSpec = tween(durationMillis = 700),
+        label = "brandAlpha"
+    )
+
     // Pulsing radar animation
     val infiniteTransition = rememberInfiniteTransition(label = "radar")
     val radarAngle by infiniteTransition.animateFloat(
@@ -91,6 +107,8 @@ fun WelcomeSplashScreen(
         Box(
             modifier = Modifier
                 .size(110.dp)
+                .scale(brandScale)
+                .alpha(brandAlpha)
                 .clip(RoundedCornerShape(28.dp))
                 .background(
                     Brush.radialGradient(
@@ -122,6 +140,7 @@ fun WelcomeSplashScreen(
 
         Text(
             text = "MIKROTECH 301",
+            modifier = Modifier.alpha(brandAlpha),
             fontSize = 26.sp,
             fontWeight = FontWeight.Black,
             letterSpacing = 1.sp,
@@ -130,6 +149,7 @@ fun WelcomeSplashScreen(
 
         Text(
             text = "ULTIMATE PRO V2",
+            modifier = Modifier.alpha(brandAlpha),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 2.5.sp,
