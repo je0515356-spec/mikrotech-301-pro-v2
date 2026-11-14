@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Calendar
 import com.example.data.routeros.ConnectionStatus
 import com.example.ui.MikrotechViewModel
 import com.example.ui.components.CommercialSignatureCard
@@ -53,6 +56,8 @@ fun DashboardScreen(
     val todaySales by viewModel.todaySales.collectAsState()
     val allSales by viewModel.allSales.collectAsState()
 
+    val reveal = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { reveal.animateTo(1f, tween(650, easing = FastOutSlowInEasing)) }
     val totalActiveClients = hotspotActive.size + pppActive.size
     val activeTicketsCount = hotspotUsers.count { !it.disabled && it.uptime != "0s" }
     val availableTicketsCount = hotspotUsers.count { it.uptime == "0s" }
@@ -67,16 +72,16 @@ fun DashboardScreen(
     ) {
         item {
             Surface(
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(28.dp),
                 color = MikrotechBlue,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().alpha(reveal.value)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
                             Brush.linearGradient(
-                                listOf(MikrotechBlue, Color(0xFF102B5B), Color(0xFF07152C))
+                                listOf(Color(0xFF07162D), Color(0xFF16347B), Color(0xFF39166C))
                             )
                         )
                         .padding(20.dp)
@@ -103,6 +108,7 @@ fun DashboardScreen(
                             }
                         }
                         Text("Pilotage local de votre Wi-Fi Zone", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text("Hotspot  •  PPPoE  •  Billetterie", color = MikrotechCyan, fontWeight = FontWeight.Medium, fontSize = 12.sp)
                         Text(
                             "${routerResource.boardName}  •  RouterOS ${routerResource.version}",
                             color = Color.White.copy(alpha = 0.72f), fontSize = 12.sp
@@ -395,23 +401,30 @@ fun DashboardScreen(
         item {
             LuxuryCard {
                 Text(
-                    text = "Ventes quotidiennes (Ariary)",
+                    text = "Ventes quotidiennes réelles (Ariary)",
                     fontSize = 13.sp,
                     color = MikrotechTextSecondary,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                val sampleDays = listOf(
-                    "J-6" to 12000L,
-                    "J-5" to 18500L,
-                    "J-4" to 25000L,
-                    "J-3" to 15000L,
-                    "J-2" to 32000L,
-                    "Hier" to 28000L,
-                    "Auj" to (todayRevenue.coerceAtLeast(1500L))
-                )
-                val maxVal = sampleDays.maxOfOrNull { it.second } ?: 1L
+                // Real sales history, computed from locally recorded transactions.
+                // No synthetic or invented dashboard revenue values.
+                val dayStart = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                val sampleDays = (6 downTo 0).map { daysAgo ->
+                    val start = (dayStart.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -daysAgo) }.timeInMillis
+                    val end = (dayStart.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 1 - daysAgo) }.timeInMillis
+                    val amount = allSales.filter {
+                        it.timestamp >= start && it.timestamp < end && it.status == "COMPLETED"
+                    }.sumOf { it.amountAriary }
+                    (if (daysAgo == 0) "Auj" else "J-$daysAgo") to amount
+                }
+                val maxVal = (sampleDays.maxOfOrNull { it.second } ?: 0L).coerceAtLeast(1L)
 
                 Box(
                     modifier = Modifier
