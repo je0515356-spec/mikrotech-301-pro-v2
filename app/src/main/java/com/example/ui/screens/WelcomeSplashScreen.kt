@@ -93,10 +93,10 @@ fun WelcomeSplashScreen(
 
     if (showWelcomeIntro) {
         val pulse by infiniteTransition.animateFloat(
-            initialValue = 0.92f,
-            targetValue = 1.08f,
+            initialValue = 0.965f,
+            targetValue = 1.035f,
             animationSpec = infiniteRepeatable(
-                animation = tween(1700, easing = FastOutSlowInEasing),
+                animation = tween(2400, easing = FastOutSlowInEasing),
                 repeatMode = RepeatMode.Reverse
             ),
             label = "introPulse"
@@ -128,7 +128,7 @@ fun WelcomeSplashScreen(
                     Icon(Icons.Default.Router, contentDescription = "MIKROTECH 301", tint = Color(0xFF25D9FF), modifier = Modifier.size(85.dp))
                 }
                 Text("MIKROTECH 301", fontSize = 29.sp, fontWeight = FontWeight.Black, color = Color.White, letterSpacing = 1.sp)
-                Text("ULTIMATE PRO", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC368FF), letterSpacing = 3.sp)
+                Text("ÉDITION PROFESSIONNELLE", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFFC368FF), letterSpacing = 3.sp)
                 Text("Votre réseau. Votre business. Votre contrôle.", fontSize = 13.sp, color = Color(0xFFBAC8E9), textAlign = TextAlign.Center)
                 Spacer(Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
