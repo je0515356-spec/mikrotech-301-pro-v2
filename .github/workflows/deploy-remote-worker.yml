@@ -1,0 +1,52 @@
+name: Deploy MIKROTECK Remote Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/worker/src/**'
+      - 'cloudflare/worker/wrangler.toml'
+      - '.github/workflows/deploy-remote-worker.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mikroteck-remote-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: cloudflare-remote
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Cloudflare configuration
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          D1_ID: ${{ vars.CLOUDFLARE_D1_DATABASE_ID }}
+        run: |
+          test -n "$CF_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN secret"; exit 1; }
+          test -n "$CF_ACCOUNT" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID secret"; exit 1; }
+          test -n "$D1_ID" || { echo "::error::Missing CLOUDFLARE_D1_DATABASE_ID variable"; exit 1; }
+      - name: Generate D1 binding configuration
+        env:
+          D1_ID: ${{ vars.CLOUDFLARE_D1_DATABASE_ID }}
+        run: |
+          printf '\n[[d1_databases]]\nbinding = "DB"\ndatabase_name = "mikroteck-remote-db"\ndatabase_id = "%s"\n' "$D1_ID" >> cloudflare/worker/wrangler.toml
+      - name: Deploy existing Worker (preserve existing Worker secrets)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.45.0'
+          workingDirectory: cloudflare/worker
+          command: deploy --name mikroteck-remote-api
+        env:
+          CLOUDFLARE_D1_DATABASE_ID: ${{ vars.CLOUDFLARE_D1_DATABASE_ID }}
+      - name: Verify public health
+        run: |
+          curl --fail --silent --show-error --retry 3 --retry-delay 3 \
+            https://mikroteck-remote-api.je0515356.workers.dev/health
