@@ -81,7 +81,7 @@ export default {
           .bind(id, body.router_id, "router.identity").run();
         return json({ command_id: id, status: "pending" }, 201);
       }
-      if (request.method === "GET" && /^\\/admin\\/commands\\/[0-9a-f-]{36}$/.test(url.pathname)) {
+      if (request.method === "GET" && /^\/admin\/commands\/[0-9a-f-]{36}$/.test(url.pathname)) {
         const secret = env.ADMIN_BOOTSTRAP_SECRET;
         if (!secret || secret.length < 32 || !equalConstantTime(bearer(request), secret)) return json({ error: "Unauthorized" }, 401);
         const id = url.pathname.split("/").pop();
