@@ -87,7 +87,7 @@ fun DashboardScreen(
                             Spacer(Modifier.width(10.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text("MIKROTECH 301", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
-                                Text("CENTRE DE CONTRÔLE", color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp, letterSpacing = 2.sp)
+                                Text("TABLEAU DE BORD PROFESSIONNEL", color = Color.White.copy(alpha = 0.7f), fontSize = 10.sp, letterSpacing = 2.sp)
                             }
                             Surface(
                                 color = if (connectionStatus == ConnectionStatus.CONNECTED) MikrotechGreen.copy(alpha = 0.2f) else MikrotechOrange.copy(alpha = 0.2f),
@@ -102,7 +102,7 @@ fun DashboardScreen(
                                 )
                             }
                         }
-                        Text("Votre réseau, en temps réel.", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text("Pilotage local de votre Wi-Fi Zone", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                         Text(
                             "${routerResource.boardName}  •  RouterOS ${routerResource.version}",
                             color = Color.White.copy(alpha = 0.72f), fontSize = 12.sp
@@ -127,7 +127,7 @@ fun DashboardScreen(
         }
 
         item {
-            Text("ACCÈS RAPIDE", fontWeight = FontWeight.Bold, color = MikrotechTextPrimary, fontSize = 13.sp, letterSpacing = 1.sp)
+            Text("ACTIONS RAPIDES", fontWeight = FontWeight.Bold, color = MikrotechTextPrimary, fontSize = 13.sp, letterSpacing = 1.sp)
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
@@ -218,7 +218,7 @@ fun DashboardScreen(
                 StatCard(
                     title = "Revenus du Mois",
                     value = formatAriary(thisMonthRevenue),
-                    subtitle = "Novembre 2026",
+                    subtitle = "Suivi mensuel",
                     icon = Icons.Default.TrendingUp,
                     iconColor = MikrotechBlue,
                     modifier = Modifier.weight(1f),
